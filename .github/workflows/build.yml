@@ -11,19 +11,6 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
-name: Build iOS Keyboard IPA
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: macos-latest
-
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
 
     - name: Package Project Files
       run: |
@@ -37,24 +24,3 @@ jobs:
       with:
         name: GenshinKeyboard-Files
         path: build/GenshinKeyboard.zip
-    - name: Set up Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '26.5.0'
-
-    - name: Build and Package IPA
-      run: |
-        echo "Creating IPA package..."
-        # بناء المشروع وإخراجه بصيغة أرشيف
-        xcodebuild archive -scheme "GenshinKeyboard" -archivePath build/GenshinKeyboard.xcarchive
-        # تحويل الأرشيف إلى ملف ipa
-        xcodebuild -exportArchive -archivePath build/GenshinKeyboard.xcarchive -exportPath build/Payload -exportOptionsPlist exportOptions.plist || echo "Export phase initiated"
-        
-        # ضغط الملف الناتج
-        cd build/Payload && zip -r GenshinKeyboard.ipa .
-
-    - name: Upload IPA Package
-      uses: actions/upload-artifact@v4
-      with:
-        name: GenshinKeyboard-iPad-IPA
-        path: build/Payload/GenshinKeyboard.ipa
