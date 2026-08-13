@@ -2,7 +2,7 @@ import UIKit
 
 class KeyboardViewController: UIInputViewController {
 
-    private var isGenshinMode = false
+    private var modeState = 0
     private var buffer = ""
     private var composerLabel: UILabel!
     private var modeButton: UIButton!
@@ -50,12 +50,12 @@ class KeyboardViewController: UIInputViewController {
         bar.spacing = spacing
 
         modeButton = UIButton(type: .system)
-        modeButton.setTitle("Genshin Mode: OFF", for: .normal)
+        modeButton.setTitle("وضع: عادي", for: .normal)
         modeButton.titleLabel?.font = .systemFont(ofSize: isPad ? 18 : 13, weight: .bold)
         modeButton.backgroundColor = .lightGray
         modeButton.layer.cornerRadius = cornerRadius
         modeButton.heightAnchor.constraint(equalToConstant: isPad ? 48 : 36).isActive = true
-        modeButton.addTarget(self, action: #selector(toggleMode), for: .touchUpInside)
+        modeButton.addTarget(self, action: #selector(cycleMode), for: .touchUpInside)
         modeButton.setContentHuggingPriority(.required, for: .horizontal)
 
         let nextButton = UIButton(type: .system)
@@ -183,20 +183,30 @@ class KeyboardViewController: UIInputViewController {
 
     @objc private func handleSend() {
         guard !buffer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        let finalText = isGenshinMode ? ArabicShaping.processPlain(buffer) : buffer
+        let finalText: String
+        switch modeState {
+        case 1: finalText = ArabicShaping.process(buffer)
+        case 2: finalText = ArabicShaping.processPlain(buffer)
+        default: finalText = buffer
+        }
         textDocumentProxy.insertText(finalText)
         buffer = ""
         refreshComposer()
     }
 
-    @objc private func toggleMode() {
-        isGenshinMode.toggle()
-        if isGenshinMode {
-            modeButton.setTitle("Genshin Mode: ON", for: .normal)
+    @objc private func cycleMode() {
+        modeState = (modeState + 1) % 3
+        switch modeState {
+        case 1:
+            modeButton.setTitle("وضع: Genshin (مثل PC)", for: .normal)
             modeButton.backgroundColor = .systemGreen
             modeButton.setTitleColor(.white, for: .normal)
-        } else {
-            modeButton.setTitle("Genshin Mode: OFF", for: .normal)
+        case 2:
+            modeButton.setTitle("وضع: عكس فقط", for: .normal)
+            modeButton.backgroundColor = .systemOrange
+            modeButton.setTitleColor(.white, for: .normal)
+        default:
+            modeButton.setTitle("وضع: عادي", for: .normal)
             modeButton.backgroundColor = .lightGray
             modeButton.setTitleColor(.systemBlue, for: .normal)
         }
