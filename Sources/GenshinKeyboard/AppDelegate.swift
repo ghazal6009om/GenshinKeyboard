@@ -10,7 +10,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         let window = UIWindow(frame: UIScreen.main.bounds)
-        window.rootViewController = InstructionsViewController()
+        let tab = UITabBarController()
+        tab.viewControllers = [ConverterViewController(), InstructionsViewController()]
+        window.rootViewController = tab
         window.makeKeyAndVisible()
         self.window = window
         return true
@@ -22,6 +24,7 @@ final class InstructionsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        title = "طريقة التفعيل"
 
         let title = UILabel()
         title.text = "Genshin Keyboard"
