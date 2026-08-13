@@ -1,0 +1,19 @@
+# Xcode
+build/
+DerivedData/
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+*.xcuserstate
+
+# Swift
+.build/
+.swiftpm/
+
+# Python legacy
+__pycache__/
+*.pyc
+
+# IPA output
+*.ipa
+Payload/

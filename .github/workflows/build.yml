@@ -1,22 +1,41 @@
-name: Build Valid IPA
+name: Build Real IPA
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Build IPA Structure
+
+    - name: Install XcodeGen
+      run: brew install xcodegen
+
+    - name: Generate Xcode Project
+      run: xcodegen generate
+
+    - name: Build (unsigned)
       run: |
-        mkdir -p Payload/GenshinKeyboard.app
-        cp Info.plist Payload/GenshinKeyboard.app/
-        cp *.swift Payload/GenshinKeyboard.app/
-        cp *.py Payload/GenshinKeyboard.app/
-        # ضغط الهيكل الصحيح
+        xcodebuild \
+          -project GenshinKeyboard.xcodeproj \
+          -scheme GenshinKeyboard \
+          -configuration Release \
+          -derivedDataPath build \
+          -destination 'generic/platform=iOS' \
+          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGNING_REQUIRED=NO \
+          build
+
+    - name: Package Unsigned IPA
+      run: |
+        APP=$(find build/Build/Products -name "GenshinKeyboard.app" -maxdepth 2 | head -1)
+        mkdir -p Payload
+        cp -R "$APP" Payload/
         zip -r GenshinKeyboard.ipa Payload
+
     - uses: actions/upload-artifact@v4
       with:
         name: GenshinKeyboard-Real-IPA

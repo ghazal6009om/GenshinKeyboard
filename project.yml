@@ -1,0 +1,59 @@
+name: GenshinKeyboard
+options:
+  bundleIdPrefix: com.ghazal
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.7"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGN_IDENTITY: ""
+
+targets:
+  GenshinKeyboard:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/GenshinKeyboard
+        excludes:
+          - Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ghazal.GenshinKeyboard
+        PRODUCT_NAME: GenshinKeyboard
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_FILE: Sources/GenshinKeyboard/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: GenshinKeyboardKeyboard
+        embed: true
+
+  GenshinKeyboardKeyboard:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Sources/GenshinKeyboardKeyboard
+        excludes:
+          - Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ghazal.GenshinKeyboard.Keyboard
+        PRODUCT_NAME: GenshinKeyboardKeyboard
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_FILE: Sources/GenshinKeyboardKeyboard/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        SKIP_INSTALL: YES
+
+schemes:
+  GenshinKeyboard:
+    build:
+      targets:
+        GenshinKeyboard: all
+        GenshinKeyboardKeyboard: all
+    run:
+      config: Debug
+    archive:
+      config: Release
