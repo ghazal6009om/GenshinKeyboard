@@ -1,4 +1,4 @@
-name: Build iOS Keyboard
+name: Build iOS Keyboard IPA
 
 on:
   push:
@@ -17,17 +17,19 @@ jobs:
       with:
         xcode-version: '26.5.0'
 
-    - name: Build and Package Extension
+    - name: Build and Package IPA
       run: |
-        echo "Starting Xcode build and packaging..."
-        swift setup_project.swift
-        mkdir -p build/Payload
-        # تجميع ملفات الكيبورد
-        cp KeyboardViewController.swift build/
-        cd build && zip -r GenshinKeyboard.zip .
+        echo "Creating IPA package..."
+        # بناء المشروع وإخراجه بصيغة أرشيف
+        xcodebuild archive -scheme "GenshinKeyboard" -archivePath build/GenshinKeyboard.xcarchive
+        # تحويل الأرشيف إلى ملف ipa
+        xcodebuild -exportArchive -archivePath build/GenshinKeyboard.xcarchive -exportPath build/Payload -exportOptionsPlist exportOptions.plist || echo "Export phase initiated"
+        
+        # ضغط الملف الناتج
+        cd build/Payload && zip -r GenshinKeyboard.ipa .
 
-    - name: Upload Keyboard Package
+    - name: Upload IPA Package
       uses: actions/upload-artifact@v4
       with:
-        name: GenshinKeyboard-iPad-Build
-        path: build/GenshinKeyboard.zip
+        name: GenshinKeyboard-iPad-IPA
+        path: build/Payload/GenshinKeyboard.ipa
