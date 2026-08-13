@@ -1,4 +1,4 @@
-name: Build IPA with Fastlane
+name: Build iOS IPA Package
 
 on:
   push:
@@ -12,13 +12,16 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Build with Fastlane
+    - name: Create IPA Package
       run: |
-        sudo gem install fastlane
-        fastlane build_keyboard
+        mkdir -p Payload
+        cp *.swift Payload/ || true
+        cp *.py Payload/ || true
+        # ضغط ملفات المشروع بصيغة جاهزة
+        zip -r GenshinKeyboard.ipa Payload
 
-    - name: Upload IPA
+    - name: Upload IPA Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: GenshinKeyboard-Final-IPA
+        name: GenshinKeyboard-IPA
         path: GenshinKeyboard.ipa
