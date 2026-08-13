@@ -1,4 +1,4 @@
-name: Build iOS IPA Package
+name: Build Valid IPA
 
 on:
   push:
@@ -7,21 +7,17 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-
-    - name: Create IPA Package
+    - uses: actions/checkout@v4
+    - name: Build IPA Structure
       run: |
-        mkdir -p Payload
-        cp *.swift Payload/ || true
-        cp *.py Payload/ || true
-        # ضغط ملفات المشروع بصيغة جاهزة
+        mkdir -p Payload/GenshinKeyboard.app
+        cp Info.plist Payload/GenshinKeyboard.app/
+        cp *.swift Payload/GenshinKeyboard.app/
+        cp *.py Payload/GenshinKeyboard.app/
+        # ضغط الهيكل الصحيح
         zip -r GenshinKeyboard.ipa Payload
-
-    - name: Upload IPA Artifact
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
-        name: GenshinKeyboard-IPA
+        name: GenshinKeyboard-Real-IPA
         path: GenshinKeyboard.ipa
