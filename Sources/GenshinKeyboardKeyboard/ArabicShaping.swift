@@ -63,6 +63,54 @@ enum ArabicShaping {
         forms[c] != nil
     }
 
+    static func isArabicChar(_ c: Character) -> Bool {
+        if c == " " || c == "\t" || c == "\n" { return true }
+        guard let v = c.unicodeScalars.first?.value else { return false }
+        return (0x0600...0x06FF).contains(v)
+            || (0x0750...0x077F).contains(v)
+            || (0x08A0...0x08FF).contains(v)
+            || (0xFB50...0xFDFF).contains(v)
+            || (0xFE70...0xFEFF).contains(v)
+    }
+
+    /// يعكس النص إلى الترتيب البصري بأحرف أساسية (بدون تشكيل).
+    /// مناسب للألعاب التي تُطبّع Presentation Forms وتحوّلها لأحرف أساسية.
+    static func processPlain(_ text: String) -> String {
+        let chars = Array(text)
+        var runs: [[Character]] = []
+        var current: [Character] = []
+        var currentArabic = false
+
+        for (i, c) in chars.enumerated() {
+            let isA = isArabicChar(c)
+            if i == 0 {
+                currentArabic = isA
+                current = [c]
+                continue
+            }
+            if isA == currentArabic {
+                current.append(c)
+            } else {
+                runs.append(current)
+                current = [c]
+                currentArabic = isA
+            }
+        }
+        if !current.isEmpty {
+            runs.append(current)
+        }
+
+        var parts: [String] = []
+        for run in runs {
+            if isArabicChar(run[0]) {
+                parts.append(String(run.reversed()))
+            } else {
+                parts.append(String(run))
+            }
+        }
+        return parts.reversed().joined()
+    }
+
     static func shape(_ text: String) -> String {
         let chars = Array(text)
         var result = ""

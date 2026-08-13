@@ -183,7 +183,7 @@ class KeyboardViewController: UIInputViewController {
 
     @objc private func handleSend() {
         guard !buffer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        let finalText = isGenshinMode ? ArabicShaping.process(buffer) : buffer
+        let finalText = isGenshinMode ? ArabicShaping.processPlain(buffer) : buffer
         textDocumentProxy.insertText(finalText)
         buffer = ""
         refreshComposer()
